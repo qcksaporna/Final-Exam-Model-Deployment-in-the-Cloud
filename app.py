@@ -9,7 +9,7 @@ weather_labels = {0: 'Cloudy', 1: 'Rain', 2: 'Shine', 3: 'Sunrise'}
 
 @st.cache_resource
 def load_my_model():
-    model_path = 'finalmodel.keras'  # Use .keras or .h5 depending on how you saved
+    model_path = 'final_modelxd'  # Use .keras or .h5 depending on how you saved
     try:
         model = load_model(model_path)
         return model
