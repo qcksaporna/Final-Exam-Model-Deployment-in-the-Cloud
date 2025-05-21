@@ -7,10 +7,9 @@ import numpy as np
 # Define the weather labels
 weather_labels = {0: 'Cloudy', 1: 'Rain', 2: 'Shine', 3: 'Sunrise'}
 
-# Load the trained model
 @st.cache_resource
 def load_my_model():
-    model_path = 'finalmodel'  # Or 'finalmodel.h5' if using HDF5 format
+    model_path = 'finalmodel.keras'  # Use .keras or .h5 depending on how you saved
     try:
         model = load_model(model_path)
         return model
@@ -27,17 +26,15 @@ uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    st.image(image, caption='Uploaded Image.', use_column_width=True)
+    st.image(image, caption='Uploaded Image.', use_container_width=True)
 
     if model is not None:
-        # Preprocess the image
         img = image.resize((128, 128))
         if img.mode != 'RGB':
             img = img.convert('RGB')
         img_array = np.array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
 
-        # Make prediction
         prediction = model.predict(img_array)
         predicted_class = np.argmax(prediction)
         predicted_label = weather_labels[predicted_class]
