@@ -26,7 +26,8 @@ file = st.file_uploader("Choose a weather image", type=["jpg", "jpeg", "png"])
 # Image preprocessing and prediction
 def import_and_predict(image_data, model):
     size = (128, 128)
-    image = ImageOps.fit(image_data, size, Image.ANTIALIAS)
+    image = image_data.convert("RGB")
+    image = ImageOps.fit(image, size, Image.ANTIALIAS)
     img = np.asarray(image)
 
     if img.ndim == 2 or img.shape[2] != 3:
