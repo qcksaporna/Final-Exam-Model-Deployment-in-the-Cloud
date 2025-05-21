@@ -9,10 +9,10 @@ weather_labels = {0: 'Cloudy', 1: 'Rain', 2: 'Shine', 3: 'Sunrise'}
 
 @st.cache_resource
 def load_my_model():
-    # Use .keras or .h5 depending on how you saved
-    model_path = 'final_modelxd' # <--- Changed here: added .keras extension
+    model_path = 'final_modelxd' # Or 'final_modelxd.h5'
     try:
-        model = load_model(model_path)
+        # Add compile=False here
+        model = load_model(model_path, compile=False)
         return model
     except Exception as e:
         st.error(f"Error loading model: {e}")
@@ -29,7 +29,7 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption='Uploaded Image.', use_container_width=True)
 
-    if model is not None: # Ensure model was loaded successfully before proceeding
+    if model is not None:
         img = image.resize((128, 128))
         if img.mode != 'RGB':
             img = img.convert('RGB')
@@ -41,8 +41,8 @@ if uploaded_file is not None:
             predicted_class = np.argmax(prediction)
             predicted_label = weather_labels[predicted_class]
 
-            st.write(f"Prediction: **{predicted_label}**") # Added bold for clarity
+            st.write(f"Prediction: **{predicted_label}**")
         except Exception as e:
-            st.error(f"Error during prediction: {e}") # Catch potential errors during prediction as well
+            st.error(f"Error during prediction: {e}")
     else:
         st.warning("Model could not be loaded. Please check the model path and file.")
