@@ -11,7 +11,7 @@ weather_labels = {0: 'Cloudy', 1: 'Rain', 2: 'Shine', 3: 'Sunrise'}
 # Make sure 'best_weather_model.h5' is in the same directory as your app.py or provide the full path
 @st.cache_resource
 def load_my_model():
-    model_path = 'final_model.h5' # Assuming the model is in the same directory
+    model_path = 'finalmodel' # Assuming the model is in the same directory
     try:
         model = load_model(model_path)
         return model
