@@ -1,47 +1,51 @@
 import streamlit as st
 import tensorflow as tf
-from tensorflow.keras.models import load_model
-from PIL import Image
+from tensorflow.keras.preprocessing import image
 import numpy as np
+from PIL import Image
+import pandas as pd
 
-# Define the weather labels
-weather_labels = {0: 'Cloudy', 1: 'Rain', 2: 'Shine', 3: 'Sunrise'}
+# Load the model
+model = tf.keras.models.load_model('finalmodel')
 
-# Load the trained model
-@st.cache_resource
-def load_my_model():
-    model_path = 'finalmodel'  # Or 'finalmodel.h5' if using HDF5 format
-    try:
-        model = load_model(model_path)
-        return model
-    except Exception as e:
-        st.error(f"Error loading model: {e}")
-        return None
+# Class labels
+class_names = ['Cloudy', 'Rain', 'Shine', 'Sunrise']
 
-model = load_my_model()
-
-st.title("Weather Image Classifier")
-st.write("Upload an image and the model will predict the weather.")
-
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
+st.title("**FINAL SKILL EXAM:** Deep Learning Weather Image Classifier Using CNN")
+st.markdown("Name: Rick Melvhin R. Alcoseba")
+st.markdown("Section: CPE32S2")
+st.markdown("This program is a deep learning-based weather image classifier that uses a Convolutional Neural Network (CNN) to predict weather conditions from images. Users can upload any weather-related image, and the model will classify it as Cloudy, Rain, Shine, or Sunrise.")
+st.markdown("-----------------------------------------------------------------------------------------------------")
+# Image uploader
+uploaded_file = st.file_uploader("Upload an image...", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    st.image(image, caption='Uploaded Image.', use_column_width=True)
+    img = Image.open(uploaded_file).convert('RGB').resize((224, 224))
+    st.image(img, caption="Uploaded Image", use_column_width=True)
 
-    if model is not None:
-        # Preprocess the image
-        img = image.resize((128, 128))
-        if img.mode != 'RGB':
-            img = img.convert('RGB')
-        img_array = np.array(img) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)
+    # Preprocess image
+    img_array = image.img_to_array(img) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
 
-        # Make prediction
-        prediction = model.predict(img_array)
-        predicted_class = np.argmax(prediction)
-        predicted_label = weather_labels[predicted_class]
+    try:
+        # Get prediction from SavedModel
+        infer = model.signatures["serving_default"]
+        input_tensor = tf.convert_to_tensor(img_array, dtype=tf.float32)
+        output = infer(input_tensor)
+        prediction = list(output.values())[0].numpy()[0]
 
-        st.write(f"Prediction: {predicted_label}")
-    else:
-        st.warning("Model could not be loaded. Please check the model path.")
+        # Convert predictions to percent format
+        prediction_percent = [f"{p * 100:.2f}%" for p in prediction]
+
+        # Display predictions in a labeled table
+        df = pd.DataFrame([prediction_percent], columns=class_names)
+        st.markdown("**Prediction Confidence:**")
+        st.table(df)
+
+        # Show final result
+        predicted_class = class_names[np.argmax(prediction)]
+        confidence = np.max(prediction) * 100
+        st.success(f"**Prediction:** {predicted_class} ({confidence:.2f}% confidence)")
+
+    except Exception as e:
+        st.error(f"Prediction failed:\n\n{e}")
