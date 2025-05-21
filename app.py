@@ -1,47 +1,49 @@
 import streamlit as st
 import tensorflow as tf
+from tensorflow.keras.models import load_model
+from PIL import Image
 import numpy as np
-from PIL import Image, ImageOps
-import cv2
 
-# Load trained model
+# Define the weather labels
+weather_labels = {0: 'Cloudy', 1: 'Rain', 2: 'Shine', 3: 'Sunrise'}
+
+# Load the trained model (replace with the actual path to your model file)
+# Make sure 'best_weather_model.h5' is in the same directory as your app.py or provide the full path
 @st.cache_resource
-def load_model():
-    model = tf.keras.models.load_model('final_model.h5')
-    return model
+def load_my_model():
+    model_path = 'final_model.h5' # Assuming the model is in the same directory
+    try:
+        model = load_model(model_path)
+        return model
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
+        return None
 
-model = load_model()
+model = load_my_model()
 
-# Define weather class names
-class_names = ['Cloudy', 'Rain', 'Shine', 'Sunrise']
+st.title("Weather Image Classifier")
+st.write("Upload an image and the model will predict the weather.")
 
-# Streamlit UI
-st.title("Weather Image Classification")
-st.write("""
-Upload an image and the model will predict the weather condition (Cloudy, Rain, Shine, Sunrise).
-""")
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
 
-file = st.file_uploader("Choose a weather image", type=["jpg", "jpeg", "png"])
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    st.image(image, caption='Uploaded Image.', use_column_width=True)
 
-# Image preprocessing and prediction
-def import_and_predict(image_data, model):
-    size = (128, 128)
-    image = image_data.convert("RGB")
-    image = ImageOps.fit(image, size, Image.ANTIALIAS)
-    img = np.asarray(image)
+    if model is not None:
+        # Preprocess the image
+        img = image.resize((128, 128))
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+        img_array = np.array(img)
+        img_array = img_array / 255.0
+        img_array = np.expand_dims(img_array, axis=0) # Add batch dimension
 
-    if img.ndim == 2 or img.shape[2] != 3:
-        img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+        # Make prediction
+        prediction = model.predict(img_array)
+        predicted_class = np.argmax(prediction)
+        predicted_label = weather_labels[predicted_class]
 
-    img_reshape = img.reshape((1, 128, 128, 3)) / 255.0
-    prediction = model.predict(img_reshape)
-    return prediction
-
-if file is None:
-    st.text("Please upload an image file")
-else:
-    image = Image.open(file)
-    st.image(image, use_column_width=True)
-    prediction = import_and_predict(image, model)
-    result = class_names[np.argmax(prediction)]
-    st.success(f"Prediction: {result}")
+        st.write(f"Prediction: {predicted_label}")
+    else:
+        st.warning("Model could not be loaded. Please check the model path.")
