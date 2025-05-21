@@ -7,11 +7,10 @@ import numpy as np
 # Define the weather labels
 weather_labels = {0: 'Cloudy', 1: 'Rain', 2: 'Shine', 3: 'Sunrise'}
 
-# Load the trained model (replace with the actual path to your model file)
-# Make sure 'best_weather_model.h5' is in the same directory as your app.py or provide the full path
+# Load the trained model
 @st.cache_resource
 def load_my_model():
-    model_path = 'finalmodel' # Assuming the model is in the same directory
+    model_path = 'finalmodel'  # Or 'finalmodel.h5' if using HDF5 format
     try:
         model = load_model(model_path)
         return model
@@ -35,9 +34,8 @@ if uploaded_file is not None:
         img = image.resize((128, 128))
         if img.mode != 'RGB':
             img = img.convert('RGB')
-        img_array = np.array(img)
-        img_array = img_array / 255.0
-        img_array = np.expand_dims(img_array, axis=0) # Add batch dimension
+        img_array = np.array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
 
         # Make prediction
         prediction = model.predict(img_array)
