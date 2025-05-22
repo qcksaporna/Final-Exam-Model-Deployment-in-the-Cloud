@@ -22,8 +22,8 @@ st.write("Upload an image and get a weather prediction using a trained CNN model
 @st.cache_resource
 def load_my_model():
     try:
-       model = tf.keras.models.load_model('final_model.h5', compile=False)
-       return model
+        model = load_model('final_model.h5', compile=False)
+        return model
     except Exception as e:
         st.error(f"Error loading model: {e}")
         return None
