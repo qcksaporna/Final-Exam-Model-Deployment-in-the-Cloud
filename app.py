@@ -9,10 +9,8 @@ st.markdown("""
 ### Course Code: CPE 019  
 ### Code Title: Emerging Technologies 2 in CpE  
 ### 2nd Semester | AY 2024-2025  
-<hr>
-### <u>Final Exam</u>  
-**Name:** Christian Kim P. Saporna  
-**Section:** CPE32S2  
+Name: Christian Kim P. Saporna  
+Section: CPE32S2  
 """, unsafe_allow_html=True)
 
 st.title("☁️ Weather Image Classifier")
