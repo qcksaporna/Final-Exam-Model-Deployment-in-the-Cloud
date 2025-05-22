@@ -52,7 +52,7 @@ if uploaded_file is not None:
             confidence = np.max(predictions) * 100
 
             st.markdown(f"### 🧠 Prediction: **{pred_label}**")
-            st.markdown(f"### 🔍 Confidence: **{confidence:.2f}%**")
+            st.markdown(f"### 🔍 Accuracy: **{confidence:.2f}%**")
 
             st.subheader("📊 Class Probabilities:")
             for i, prob in enumerate(predictions[0]):
