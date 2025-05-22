@@ -54,9 +54,7 @@ if uploaded_file is not None:
             st.markdown(f"### 🧠 Prediction: **{pred_label}**")
             st.markdown(f"### 🔍 Accuracy: **{confidence:.2f}%**")
 
-            st.subheader("📊 Class Probabilities:")
-            for i, prob in enumerate(predictions[0]):
-                st.write(f"- {weather_labels[i]}: {prob * 100:.2f}%")
+            
 
         except Exception as e:
             st.error(f"Prediction error: {e}")
